@@ -238,7 +238,7 @@ feature_names = ["hour", "gender_dum", "userAgentVec", "days_active", "n_session
 # Build pipeline
 # =============================================================================
 
-train, test = df_churn.randomSplit([0.2, 0.8], 42)
+train, test = df_churn.randomSplit([0.8, 0.2], 42)
 lr = LogisticRegression(maxIter=10, regParam=0.0, elasticNetParam=0)
 assembler = VectorAssembler(inputCols=feature_names, outputCol="features_vec")
 # Scale each column
