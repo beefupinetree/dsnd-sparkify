@@ -33,8 +33,8 @@ The data at our disposal is a very granular log of the activities on the service
 
 ### File description
 
-* sparkify_local.ipynb: The Jupyter notebook containing the code used on the sample dataset
-* sparkify_aws.ipynb
+* sparkify_local.ipynb: The Jupyter notebook containing the code used on the sample dataset which was tested on a standalone PC
+* sparkify_aws.ipynb: The Jupyter notebook with the code applied on the full dataset using a cluster of 3 machines on AWS
 
 ### Summary results
 
