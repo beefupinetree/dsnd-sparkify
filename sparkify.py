@@ -15,7 +15,10 @@ from pyspark.ml.evaluation import BinaryClassificationEvaluator, MulticlassClass
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+<<<<<<< HEAD
 plt.rcParams['figure.figsize'] = 12, 9
+=======
+>>>>>>> 4e913c6597859f469b857d61affa276a8655f508
 
 import os
 os.chdir(r"C:\Users\tarek\git_workspace\dsnd-sparkify")
@@ -52,7 +55,10 @@ df.select("method").dropDuplicates().sort("method").show()
 df.select("status").dropDuplicates().sort("status").show()
 
 df.where(df.userId == "").show()
+<<<<<<< HEAD
 df.where(df.userId == "").select("page").distinct().show()
+=======
+>>>>>>> 4e913c6597859f469b857d61affa276a8655f508
 df.select("userID").distinct().count()
 
 # columns with any NaN values, Null, or missing values
@@ -148,7 +154,11 @@ cusum.filter((cusum.page == 'NextSong')) \
 
 #get_hour = udf(lambda x: datetime.datetime.fromtimestamp(x / 1000.0).hour, IntegerType())
 #song_time = df2.withColumn("hour", get_hour(df2.ts))
+<<<<<<< HEAD
 song_time = df2.filter(df2.page == "NextSong").withColumn("hour", hour(from_unixtime(col('ts')/1000)))
+=======
+song_time = df2.withColumn("hour", hour(from_unixtime(col('ts')/1000)))
+>>>>>>> 4e913c6597859f469b857d61affa276a8655f508
 
 songs_in_hour = song_time.filter(song_time.page == "NextSong") \
                 .groupby(song_time.hour).count() \
@@ -159,6 +169,7 @@ songs_in_hour.take(5)
 songs_in_hour_pd = songs_in_hour.toPandas()
 songs_in_hour_pd.hour = pd.to_numeric(songs_in_hour_pd.hour)
 
+<<<<<<< HEAD
 
 with plt.xkcd():
 
@@ -187,6 +198,14 @@ with plt.xkcd():
 #plt.ylabel("Songs played")
 #plt.title('Distribution of number of songs played throughout the day');
 
+=======
+plt.scatter(songs_in_hour_pd["hour"], songs_in_hour_pd["count"])
+plt.xlim(-1, 24);
+plt.ylim(0.99 * np.min(songs_in_hour_pd["count"]), 1.05 * np.max(songs_in_hour_pd["count"]))
+plt.xlabel("Hour")
+plt.ylabel("Songs played");
+
+>>>>>>> 4e913c6597859f469b857d61affa276a8655f508
 #test = df.select('ts', hour(from_unixtime(col('ts')/1000)).alias('hour'))
 #test = df.select('ts', from_unixtime(col('ts')/1000).alias('datetime'))
 #test.printSchema()
@@ -194,11 +213,16 @@ with plt.xkcd():
 
 # Making the churn feature display 1 for all rows of a user who canceled
 
+<<<<<<< HEAD
 #df_churn = df2.withColumn("churn", sum("churn").over(user_window))
+=======
+df_churn = df2.withColumn("churn", sum("churn").over(user_window))
+>>>>>>> 4e913c6597859f469b857d61affa276a8655f508
 #df_churn.select(["userId", "firstname", "ts", "page", "level", "churn"]).where(df_churn.userId == "18").sort("ts").collect()
 #df_churn.select(["userId", "page", "churn"]).where(df_churn.userId == "18").sort("ts").show(1000)
 
 ### Adding the hour when the song was played
+<<<<<<< HEAD
 #df_user = df_churn.withColumn("hour", hour(from_unixtime(col('ts')/1000)))
 
 avg_hour_of_play = song_time.select(["userId", "hour"]) \
@@ -248,18 +272,49 @@ df_user.groupby(["churn"]).avg().show()
 ## one hot encode userAgent column
 #encoder = OneHotEncoder(inputCol="userAgentInd", outputCol="userAgentVec")
 #user_agent = encoder.transform(df2).drop(*["userAgentInd", "userAgent"]).select(["userId", "userAgentVec"]).distinct()
+=======
+df_churn = df_churn.withColumn("hour", hour(from_unixtime(col('ts')/1000)))
+
+### Gender dummy
+df_churn.cube(["gender"]).count().show()
+#df_churn = df_churn.withColumn("gender_dum", when(df.gender == "M", 1).otherwise(when(df.gender == "F", 0).otherwise("null")))
+
+indexer = StringIndexer(inputCol="gender", outputCol="gender_dum")
+df_churn = indexer.fit(df_churn).transform(df_churn)
+#indexed.select(["userId","gender","genderIndex"]).groupby("userId").max().show()
+df_churn.cube(["gender_dum"]).count().show()
+
+### Browser dummy
+df_churn.cube(["userAgent"]).count().show(df_churn.select("userAgent").count(),False)
+# find user access agents, and perform one-hot encoding on the user 
+userAgents = df_churn.select(['userId', 'userAgent']).distinct()
+userAgents = userAgents.fillna('N/A')
+# build string indexer
+strIndexer = StringIndexer(inputCol="userAgent", outputCol="userAgentInd")
+model = strIndexer.fit(df_churn)
+df_churn = model.transform(df_churn)
+# one hot encode userAgent column
+encoder = OneHotEncoder(inputCol="userAgentInd", outputCol="userAgentVec")
+df_churn = encoder.transform(df_churn).drop(*["userAgentInd", "userAgent"])
+>>>>>>> 4e913c6597859f469b857d61affa276a8655f508
 
 ### Days of activity
 
 # Find minimum/maximum time stamp of each user
+<<<<<<< HEAD
 min_timestmp = df2.select(["userId", "ts"]).groupby("userId").min("ts")
 max_timestmp = df2.select(["userId", "ts"]).groupby("userId").max("ts")
+=======
+min_timestmp = df_churn.select(["userId", "ts"]).groupby("userId").min("ts")
+max_timestmp = df_churn.select(["userId", "ts"]).groupby("userId").max("ts")
+>>>>>>> 4e913c6597859f469b857d61affa276a8655f508
 
 # Find days active of each user
 daysActive = min_timestmp.join(max_timestmp, on="userId")
 daysActive = daysActive.withColumn("days_active", 
                                    datediff(from_unixtime(col('max(ts)')/1000),
                                             from_unixtime(col('min(ts)')/1000))).select(["userId", "days_active"]) 
+<<<<<<< HEAD
 df_user = df_user.join(daysActive, on = 'userId', how = 'left')
 
 (df_user.groupby(["churn"]).avg().select(["churn", "avg(days_active)"])
@@ -281,10 +336,24 @@ df_user = df_user.join(n_sessions, on = 'userId', how = 'left')
 ### Average number of songs per session
 
 avg_session_songs = df2.filter((df2.page == 'NextSong')) \
+=======
+df_churn = df_churn.join(daysActive, on = 'userId', how = 'left')
+
+### Number of sessions
+n_sessions = df_churn.select(["userId", "sessionId"]).distinct().groupby("userId").count().sort(["userId", "count"])
+n_sessions = n_sessions.withColumnRenamed("count", "n_sessions")
+
+df_churn = df_churn.join(n_sessions, on = 'userId', how = 'left')
+
+### Average numer of songs per session
+
+avg_session_songs = df_churn.filter((df_churn.page == 'NextSong')) \
+>>>>>>> 4e913c6597859f469b857d61affa276a8655f508
                     .groupBy('userID', 'sessionId') \
                     .agg({'song': 'count'}) \
                     .groupBy('userID') \
                     .agg({'count(song)': 'avg'})
+<<<<<<< HEAD
 #df_churn1 = df_churn.groupby(["userId"]).max("ts").show()
 
 #df_churn1 = df_churn.as[Record]
@@ -318,13 +387,27 @@ df_user = df_user.withColumnRenamed("churn", "label")
 
 # setting missing values to zero
 df_user = df_user.fillna(0)
+=======
+avg_session_songs = avg_session_songs.withColumnRenamed("avg(count(song))", "avg_sess_songs")
+
+df_churn = df_churn.join(avg_session_songs, on = 'userId', how = 'left')
+
+# Renaming churn to label
+df_churn = df_churn.withColumnRenamed("churn", "label")
+
+feature_names = ["hour", "gender_dum", "userAgentVec", "days_active", "n_sessions", "avg_sess_songs"] # df_churn.schema.names
+>>>>>>> 4e913c6597859f469b857d61affa276a8655f508
 
 # =============================================================================
 # Modeling
 # Split the full dataset into train, test, and validation sets. Test out
 # several of the machine learning methods you learned. Evaluate the accuracy
 # of the various models, tuning parameters as necessary. Determine your winning
+<<<<<<< HEAD
 # model based on test and report results on the validation set. Since
+=======
+# model based on test accuracy and report results on the validation set. Since
+>>>>>>> 4e913c6597859f469b857d61affa276a8655f508
 # the churned users are a fairly small subset, I suggest using F1 score as the
 # metric to optimize.
 # =============================================================================
@@ -333,17 +416,26 @@ df_user = df_user.fillna(0)
 # Build pipeline
 # =============================================================================
 
+<<<<<<< HEAD
 train, test = df_user.randomSplit([0.8, 0.2], 42)
 #lr = LogisticRegression(maxIter=10, regParam=0.0, elasticNetParam=0)
 
 feature_names = ["avg_play_hour", "gender_dum", "days_active", "n_sessions", "avg_sess_songs", "n_errors"] # df_churn.schema.names
 
 # Vectorize the features
+=======
+train, test = df_churn.randomSplit([0.8, 0.2], 42)
+lr = LogisticRegression(maxIter=10, regParam=0.0, elasticNetParam=0)
+>>>>>>> 4e913c6597859f469b857d61affa276a8655f508
 assembler = VectorAssembler(inputCols=feature_names, outputCol="features_vec")
 # Scale each column
 scalar = MinMaxScaler(inputCol="features_vec", outputCol="features")
 #df = assembler.transform(df)
+<<<<<<< HEAD
 #pipeline = Pipeline(stages=[assembler, scalar, lr])
+=======
+pipeline = Pipeline(stages=[assembler, scalar, lr])
+>>>>>>> 4e913c6597859f469b857d61affa276a8655f508
 
 #model = pipeline.fit(train)
 
@@ -361,6 +453,7 @@ scalar = MinMaxScaler(inputCol="features_vec", outputCol="features")
 #
 #lrModel = crossval.fit(train)
 
+<<<<<<< HEAD
 #accs = lrModel.avgMetrics
 #best_params = lrModel.bestModel.stages[-1].extractParamMap()
 #
@@ -378,6 +471,25 @@ def model_evaluator(model, metric, data):
             metric - the metric of the evaluation (f1, accuracy, etc..)
             data - dataset used in the evaluation
         returns:
+=======
+accs = lrModel.avgMetrics
+best_params = lrModel.bestModel.stages[-1].extractParamMap()
+
+results = lrModel.transform(test)
+
+print(results.filter(results.label == results.prediction).count())
+print(results.count())
+print("The highest accuracy is {:2.2%}".format(results.filter(results.label == results.prediction).count() / results.count()))
+
+
+def modelEvaluator(model, metric, data):
+    """
+        Input: 
+            model - pipeline of a list of transformers
+            metric - the metric of the evaluation (f1, accuracy, etc..)
+            data - dataset used in the evaluation
+        Output:
+>>>>>>> 4e913c6597859f469b857d61affa276a8655f508
             list of [score, confusion matrix]
         Description:
             Evaluate a model's performance with our metric of choice
@@ -390,6 +502,7 @@ def model_evaluator(model, metric, data):
     score = evaluator.evaluate(predictions)
     confusion_matrix = (predictions.groupby("label")
                                    .pivot("prediction")
+<<<<<<< HEAD
                                    .count())
     return [score, confusion_matrix]
 
@@ -458,11 +571,50 @@ param_grid = ParamGridBuilder().build()
 rf_model = pipe_run_f1(rf, param_grid, train)
 
 f1_rf, conf_mtx_rf = model_evaluator(rf_model, 'f1', test)
+=======
+                                   .count()
+                                   .toPandas())
+    return [score, confusion_matrix]
+
+paramGrid = ParamGridBuilder() \
+    .addGrid(lr.regParam, [0.0, 0.1]) \
+    .addGrid(lr.maxIter, [10]) \
+    .build()
+
+crossval = CrossValidator(estimator=pipeline,
+                          estimatorParamMaps=paramGrid,
+                          evaluator=MulticlassClassificationEvaluator(metricName="f1"),
+                          numFolds=3)
+
+lrModel = crossval.fit(train)
+
+f1_lr, conf_mtx_lr = modelEvaluator(lrModel, 'f1', test)
+print('The F1 score for the logistic regression model:', f1_lr)
+conf_mtx_lr
+
+###
+rf = RandomForestClassifier(numTrees = 50,  featureSubsetStrategy='auto')
+pipeline = Pipeline(stages=[assembler, scalar, rf])
+
+paramGrid = ParamGridBuilder() \
+    .addGrid(rf.maxBins, [16, 32]) \
+    .build()
+
+crossval = CrossValidator(estimator=pipeline,
+                          estimatorParamMaps=paramGrid,
+                          evaluator=MulticlassClassificationEvaluator(metricName="f1"),
+                          numFolds=3)
+
+rfModel = crossval.fit(train)
+
+f1_rf, conf_mtx_rf = modelEvaluator(rfModel, 'f1', test)
+>>>>>>> 4e913c6597859f469b857d61affa276a8655f508
 print('The F1 score for the random forest model:', f1_rf)
 conf_mtx_rf
 
 ###
 nb = NaiveBayes(smoothing=1.0, modelType="multinomial")
+<<<<<<< HEAD
 
 param_grid = ParamGridBuilder().build()
     #.addGrid(nb.regParam , [0.1, 0.2]) \
@@ -471,6 +623,22 @@ param_grid = ParamGridBuilder().build()
 nb_model = pipe_run_f1(nb, param_grid, train)
 
 f1_nb, conf_mtx_nb = model_evaluator(nb_model, 'f1', test)
+=======
+pipeline = Pipeline(stages=[assembler, scalar, nb])
+
+paramGrid = ParamGridBuilder() \
+    .addGrid(nb.regParam , [0.1, 0.2]) \
+    .build()
+
+crossval = CrossValidator(estimator=pipeline,
+                          estimatorParamMaps=paramGrid,
+                          evaluator=MulticlassClassificationEvaluator(metricName="f1"),
+                          numFolds=3)
+
+nbModel = crossval.fit(train)
+
+f1_nb, conf_mtx_nb = modelEvaluator(nbModel, 'f1', test)
+>>>>>>> 4e913c6597859f469b857d61affa276a8655f508
 print('The F1 score for the naive bayes model:', f1_nb)
 conf_mtx_nb
 
