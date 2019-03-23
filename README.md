@@ -1,3 +1,5 @@
+<p align="center"><img src="/img/certificate.pdf?raw=true"/></p>
+
 # Capstone Spark Project - Sparkify
 
 ### Motivation
