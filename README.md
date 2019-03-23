@@ -1,4 +1,4 @@
-<p align="center"><img src="/img/certificate.pdf?raw=true"/></p>
+<p align="center"><img src="/img/certificate.jpg?raw=true"/></p>
 
 # Capstone Spark Project - Sparkify
 
